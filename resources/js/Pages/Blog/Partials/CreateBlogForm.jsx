@@ -5,24 +5,48 @@ import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
 import TextAreaInput from '@/Components/TextAreaInput';
 
+import * as yup from 'yup';
+import { useState } from 'react';
+
+const schema = yup.object({
+    title: yup.string().required('Title is required.'),
+    content: yup.string().required('Content is required.'),
+});
+
 export default function CreateBlogForm({ className = '' }) {
     const {
         data,
         setData,
         post,
         processing,
-        errors,
+        errors: serverErrors,
         reset
     } = useForm({
         title: "",
         content: "",
     });
 
-    function handleSubmit(e) {
+    const [localErrors, setLocalErrors] = useState({});
+
+    async function handleSubmit(e) {
         e.preventDefault();
-        post('/blog/store', {
-            onSuccess: () => reset(),
-        });
+        try {
+            await schema.validate(data, { abortEarly: false }); // Validate all fields
+            setLocalErrors({}); // Clear local errors if valid
+
+            post('/blog/store', {
+                onSuccess: () => reset(),
+            });
+
+        } catch (err) {
+            if (err.name === 'ValidationError') {
+                const formattedErrors = {};
+                err.inner.forEach((e) => {
+                    formattedErrors[e.path] = e.message;
+                });
+                setLocalErrors(formattedErrors);
+            }
+        }
     }
 
     return (
@@ -36,7 +60,7 @@ export default function CreateBlogForm({ className = '' }) {
                         type="text"
                         className="mt-1 block w-full"
                     />
-                    <InputError message={errors.title} className="mt-2" />
+                    <InputError message={localErrors.title || serverErrors.title} className="mt-2" />
                 </div>
 
                 <div>
@@ -46,7 +70,7 @@ export default function CreateBlogForm({ className = '' }) {
                         onChange={(e) => setData('content', e.target.value)}
                         className="mt-1 block w-full"
                     />
-                    <InputError message={errors.content} className="mt-2" />
+                    <InputError message={localErrors.content || serverErrors.content} className="mt-2" />
                 </div>
 
                 <div className="flex items-center gap-4">
