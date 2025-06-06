@@ -27,6 +27,7 @@ export default function CreateBlogForm({ className = '' }) {
     });
 
     const [localErrors, setLocalErrors] = useState({});
+    const [successMessage, setSuccessMessage] = useState('');
 
     async function handleSubmit(e) {
         e.preventDefault();
@@ -35,7 +36,10 @@ export default function CreateBlogForm({ className = '' }) {
             setLocalErrors({}); // Clear local errors if valid
 
             post('/blog/store', {
-                onSuccess: () => reset(),
+                onSuccess: () => {
+                    reset();
+                    setSuccessMessage('Blog created successfully!');
+                }
             });
 
         } catch (err) {
@@ -51,11 +55,17 @@ export default function CreateBlogForm({ className = '' }) {
 
     return (
         <section className={className}>
+            {successMessage && (
+                <div className="p-4 mb-4 text-green-700 bg-green-100 rounded">
+                    {successMessage}
+                </div>
+            )}
             <form onSubmit={handleSubmit} className="mt-6 space-y-6">
                 <div>
                     <InputLabel htmlFor="title" value="Title" />
                     <TextInput
                         id="title"
+                        value={data.title}
                         onChange={(e) => setData('title', e.target.value)}
                         type="text"
                         className="mt-1 block w-full"
@@ -67,6 +77,7 @@ export default function CreateBlogForm({ className = '' }) {
                     <InputLabel htmlFor="content" value="Content" />
                     <TextAreaInput
                         id="content"
+                        value={data.content}
                         onChange={(e) => setData('content', e.target.value)}
                         className="mt-1 block w-full"
                     />

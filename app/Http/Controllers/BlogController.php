@@ -35,7 +35,7 @@ class BlogController extends Controller
 
     public function edit($id)
     {
-        return view('blogs.edit', ['id' => $id]);
+        return Inertia::render('Blog/Edit', ['blog' => $id]);
     }
     public function show($id)
     {
@@ -53,8 +53,18 @@ class BlogController extends Controller
     }
     public function store(Request $request)
     {
-        echo '<pre>'; print_r($request->all()); exit;
-        // Logic to store the blog post
-        return redirect()->route('blog.index')->with('success', 'Blog created successfully');
+        try {
+            Blog::create([
+            'title' => $request->title,
+            'content' => $request->content,
+            'author' => Auth::id(),
+        ]);
+
+        } catch (\Exception $e) {
+            echo '<pre>'; print_r($e); exit;
+        }
+                    
+            
+
     }
 }

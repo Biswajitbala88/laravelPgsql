@@ -37,8 +37,8 @@ export default function Index() {
                                             <td className="px-4 py-2 border-b">{blog.content}</td>
                                             <td className="px-4 py-2 border-b">{blog.author}</td>
                                             <td className="px-4 py-2 border-b">
-                                                <a href={`/blog/${blog.id}/edit`} className="text-blue-500 mr-2">Edit</a>
-                                                <a href={`/blog/${blog.id}/delete`} className="text-red-500">Delete</a>
+                                                <a href={`/blog/${blog.id}`} className="text-blue-500 mr-2">Edit</a>
+                                                <a href={`/blog/delete/${blog.id}`} className="text-red-500">Delete</a>
                                             </td>
                                         </tr>
                                     ))}
